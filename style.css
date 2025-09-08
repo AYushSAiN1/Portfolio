@@ -12,16 +12,30 @@
     font-family: neue;
 }
 
+.no-scroll {
+    overflow: hidden !important;
+    height: 100vh;
+}
+
+
+
 html,
 body {
     height: 100%;
     width: 100%;
-    overflow-x: hidden;
     color: rgb(255, 255, 255);
 }
 
 body.loading-page {
     overflow: hidden;
+    height: 100vh;
+}
+
+html.loading-page,
+body.loading-page {
+    overflow: hidden !important;
+    height: 100vh;
+    width: 100vw;
 }
 
 

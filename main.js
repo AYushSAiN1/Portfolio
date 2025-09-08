@@ -90,56 +90,64 @@ function showProjects(category) {
   });
 }
 
-// Select the loading page container
-const loadingPage = document.querySelector(".loading-page");
-
-// Function to prevent scrolling
 function preventScroll(event) {
   event.preventDefault();
 }
 
-// Add event listeners to prevent scrolling
-loadingPage.addEventListener("wheel", preventScroll, { passive: false });
-loadingPage.addEventListener("touchmove", preventScroll, { passive: false });
+function disableScroll() {
+  window.addEventListener("wheel", preventScroll, { passive: false });
+  window.addEventListener("touchmove", preventScroll, { passive: false });
+  window.addEventListener("keydown", preventScrollKeydown, false);
+}
 
-// Additional event listener for keyboard scrolling on laptops
-window.addEventListener("keydown", function (event) {
-  // Prevent default behavior if any arrow key is pressed
+function enableScroll() {
+  window.removeEventListener("wheel", preventScroll, { passive: false });
+  window.removeEventListener("touchmove", preventScroll, { passive: false });
+  window.removeEventListener("keydown", preventScrollKeydown, false);
+}
+
+function preventScrollKeydown(event) {
   if (event.key.includes("Arrow")) {
-    preventScroll(event);
+    event.preventDefault();
   }
-});
+}
+
+// Disable scroll when loader starts
+document.body.classList.add("no-scroll");
+
+// Also stop Locomotive if it exists
+if (typeof locoScroll !== "undefined") {
+  locoScroll.stop();
+}
 
 var tl = gsap.timeline({
   onComplete: function () {
-    // Remove the loading page from the DOM
+    // Remove the loading page
     var loadingPage = document.querySelector(".loading-page");
-    loadingPage.remove();
+    if (loadingPage) loadingPage.remove();
+
+    // Enable scroll again
+    document.body.classList.remove("no-scroll");
+
+    // Restart Locomotive
+    if (typeof locoScroll !== "undefined") {
+      locoScroll.start();
+    }
+
     ScrollTrigger.refresh();
   },
 });
+
 tl.fromTo(
   ".logo-name",
-  {
-    y: 50,
-    opacity: 0,
-  },
-  {
-    y: 0,
-    opacity: 1,
-    duration: 2,
-    delay: 0.5,
-  }
+  { y: 50, opacity: 0 },
+  { y: 0, opacity: 1, duration: 2, delay: 0.5 }
 );
+
 tl.fromTo(
   ".loading-page",
   { opacity: 1 },
-  {
-    opacity: 0,
-    display: "none",
-    duration: 1.5,
-    delay: 1.5,
-  }
+  { opacity: 0, display: "none", duration: 1.5, delay: 1.5 }
 );
 
 tl.from(".card-right h1, .card-right span", {
